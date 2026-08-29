@@ -1,0 +1,41 @@
+# =========================
+# Build Stage
+# =========================
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+
+WORKDIR /src
+
+# Copy project files first
+COPY src/HisabDo.Domain/HisabDo.Domain.csproj src/HisabDo.Domain/
+COPY src/HisabDo.Application/HisabDo.Application.csproj src/HisabDo.Application/
+COPY src/HisabDo.Infrastructure/HisabDo.Infrastructure.csproj src/HisabDo.Infrastructure/
+COPY src/HisabDo.API/HisabDo.API.csproj src/HisabDo.API/
+
+# Restore dependencies
+RUN dotnet restore src/HisabDo.API/HisabDo.API.csproj
+
+# Copy complete source
+COPY . .
+
+# Publish API
+RUN dotnet publish src/HisabDo.API/HisabDo.API.csproj \
+    -c Release \
+    -o /app/publish \
+    --no-restore
+
+
+# =========================
+# Runtime Stage
+# =========================
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+# Render provides PORT dynamically
+ENV ASPNETCORE_URLS=http://+:${PORT}
+
+EXPOSE 10000
+
+ENTRYPOINT ["dotnet", "HisabDo.API.dll"]
