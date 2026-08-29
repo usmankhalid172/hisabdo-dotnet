@@ -1,0 +1,105 @@
+@HisabDo.API_HostAddress = http://localhost:5181
+
+GET {{HisabDo.API_HostAddress}}/api/v1/customers
+Accept: application/json
+
+###
+
+POST {{HisabDo.API_HostAddress}}/api/v1/customers
+Content-Type: application/json
+
+{
+  "name": "Ahmed Khan",
+  "phone": "03123456789",
+  "email": "ahmed@example.com",
+  "notes": "Shop owner"
+}
+
+###
+
+GET {{HisabDo.API_HostAddress}}/api/v1/transactions
+Accept: application/json
+
+###
+
+GET {{HisabDo.API_HostAddress}}/api/v1/transactions?type=1&categoryId=1&fromDate=2026-08-01&toDate=2026-08-31
+Accept: application/json
+
+###
+
+GET {{HisabDo.API_HostAddress}}/api/v1/categories/1/transactions
+Accept: application/json
+
+###
+
+POST {{HisabDo.API_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "Qamar Zaman",
+  "businessName": "My Shop",
+  "email": "qamar@example.com",
+  "phone": "03001234567",
+  "password": "Strong@123"
+}
+
+###
+
+POST {{HisabDo.API_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "qamar@example.com",
+  "password": "Strong@123"
+}
+
+###
+
+GET {{HisabDo.API_HostAddress}}/api/v1/settings
+Accept: application/json
+
+###
+
+GET {{HisabDo.API_HostAddress}}/api/v1/admin/users
+Accept: application/json
+Authorization: Bearer <paste-token-here>
+
+###
+
+PUT {{HisabDo.API_HostAddress}}/api/v1/settings
+Content-Type: application/json
+
+{
+  "currencyCode": "USD",
+  "languageCode": "en"
+}
+
+###
+
+POST {{HisabDo.API_HostAddress}}/api/v1/transactions
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "categoryId": 1,
+  "type": 1,
+  "amount": 5000,
+  "note": "Credit sale",
+  "transactionDate": "2026-08-08T10:00:00Z"
+}
+
+###
+
+GET {{HisabDo.API_HostAddress}}/api/v1/categories
+Accept: application/json
+
+###
+
+POST {{HisabDo.API_HostAddress}}/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Electricity"
+}
+
+###

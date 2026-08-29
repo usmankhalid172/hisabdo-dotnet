@@ -1,0 +1,599 @@
+{
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "https://localhost:7071/api/v1"
+        },
+        {
+            "key": "token",
+            "value": ""
+        },
+        {
+            "key": "catId",
+            "value": ""
+        },
+        {
+            "key": "custId",
+            "value": ""
+        },
+        {
+            "key": "txId",
+            "value": ""
+        }
+    ],
+    "info": {
+        "description": "Complete API collection for HisabDo Web API (v2.1 - Day 22-24). Run Auth - Login first - token is saved automatically. Create requests auto-save their IDs (catId/custId/txId) for Update/Delete/Upload requests. Default categories (Sales, Purchase, etc.) cannot be updated/deleted.",
+        "name": "HisabDo Web API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Auth - Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"fullName\":\"New User\",\"businessName\":\"My Shop\",\"email\":\"user@example.com\",\"phone\":\"03001234567\",\"password\":\"Strong@123\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+                    }
+                },
+                {
+                    "name": "Auth - Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"email\":\"demo@hisabdo.com\",\"password\":\"Demo@123\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+                    },
+                    "event": [
+                        {
+                            "script": {
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "if (json && json.token) {",
+                                    "  pm.collectionVariables.set('token', json.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            },
+                            "listen": "test"
+                        }
+                    ]
+                },
+                {
+                    "name": "Auth - My Profile",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+                    }
+                },
+                {
+                    "name": "Auth - Update Profile",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"fullName\":\"Qamar Zaman\",\"businessName\":\"Zaman Traders\",\"phone\":\"03001234567\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+                    }
+                },
+                {
+                    "name": "Auth - Change Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"oldPassword\":\"Demo@123\",\"newPassword\":\"New@Pass123\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["auth", "change-password"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Categories",
+            "item": [
+                {
+                    "name": "Categories - List (Paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["categories"], "query": [
+                            { "key": "page", "value": "1" },
+                            { "key": "pageSize", "value": "50" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Categories - By Id",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["categories", "{{catId}}"] },
+                        "description": "Uses catId saved from 'Categories - Create'."
+                    }
+                },
+                {
+                    "name": "Categories - Create",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Groceries\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["categories"] }
+                    },
+                    "event": [
+                        {
+                            "script": {
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "if (json && json.id) {",
+                                    "  pm.collectionVariables.set('catId', json.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            },
+                            "listen": "test"
+                        }
+                    ]
+                },
+                {
+                    "name": "Categories - Update",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Groceries & More\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["categories", "{{catId}}"] },
+                        "description": "Uses catId from Create. Default categories (Sales, Purchase, Rent, Food, Transport, Salary, Others) return error."
+                    }
+                },
+                {
+                    "name": "Categories - Delete",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["categories", "{{catId}}"] },
+                        "description": "Uses catId from Create. Category used by transactions cannot be deleted. Default categories cannot be deleted."
+                    }
+                },
+                {
+                    "name": "Categories - Transactions",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["categories", "1", "transactions"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Customers",
+            "item": [
+                {
+                    "name": "Customers - List (Paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["customers"], "query": [
+                            { "key": "page", "value": "1" },
+                            { "key": "pageSize", "value": "50" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Customers - By Id",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["customers", "{{custId}}"] },
+                        "description": "Uses custId saved from 'Customers - Create'."
+                    }
+                },
+                {
+                    "name": "Customers - Create",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Ali Khan\",\"phone\":\"03001234567\",\"email\":\"ali@example.com\",\"notes\":\"Regular customer\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["customers"] }
+                    },
+                    "event": [
+                        {
+                            "script": {
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "if (json && json.id) {",
+                                    "  pm.collectionVariables.set('custId', json.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            },
+                            "listen": "test"
+                        }
+                    ]
+                },
+                {
+                    "name": "Customers - Update",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\":\"Ali Khan\",\"phone\":\"03001234567\",\"email\":\"ali@example.com\",\"notes\":\"VIP customer\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["customers", "{{custId}}"] },
+                        "description": "Uses custId from Create."
+                    }
+                },
+                {
+                    "name": "Customers - Delete",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["customers", "{{custId}}"] },
+                        "description": "Uses custId from Create. Customer with transactions cannot be deleted."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Transactions",
+            "item": [
+                {
+                    "name": "Transactions - List (Paginated)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["transactions"], "query": [
+                            { "key": "Page", "value": "1" },
+                            { "key": "PageSize", "value": "50" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Transactions - Search",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["transactions"], "query": [
+                            { "key": "Search", "value": "sale" },
+                            { "key": "Page", "value": "1" },
+                            { "key": "PageSize", "value": "20" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Transactions - Filter",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["transactions"], "query": [
+                            { "key": "Type", "value": "1" },
+                            { "key": "CustomerId", "value": "2" },
+                            { "key": "CategoryId", "value": "1" },
+                            { "key": "FromDate", "value": "2026-08-01" },
+                            { "key": "ToDate", "value": "2026-08-31" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Transactions - By Id",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["transactions", "{{txId}}"] },
+                        "description": "Uses txId saved from 'Transactions - Create'."
+                    }
+                },
+                {
+                    "name": "Transactions - Create",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"customerId\":2,\"categoryId\":1,\"type\":1,\"amount\":1500.50,\"note\":\"Khata entry\",\"transactionDate\":\"2026-08-17T10:00:00Z\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["transactions"] }
+                    },
+                    "event": [
+                        {
+                            "script": {
+                                "exec": [
+                                    "const json = pm.response.json();",
+                                    "if (json && json.id) {",
+                                    "  pm.collectionVariables.set('txId', json.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            },
+                            "listen": "test"
+                        }
+                    ]
+                },
+                {
+                    "name": "Transactions - Update",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"customerId\":2,\"categoryId\":1,\"type\":1,\"amount\":1600.00,\"note\":\"Updated entry\",\"transactionDate\":\"2026-08-17T10:00:00Z\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["transactions", "{{txId}}"] },
+                        "description": "Uses txId from Create. customerId must belong to your account."
+                    }
+                },
+                {
+                    "name": "Transactions - Delete",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["transactions", "{{txId}}"] },
+                        "description": "Uses txId from Create. Soft-deletes the transaction and removes its attachment file."
+                    }
+                },
+                {
+                    "name": "Transactions - Upload Attachment",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                { "key": "file", "type": "file", "src": "" }
+                            ]
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["transactions", "{{txId}}", "attachment"] },
+                        "description": "Uses txId from Create. Select a jpg/png/gif/pdf file (max 10MB). Re-uploading replaces the old file."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Reports",
+            "item": [
+                {
+                    "name": "Reports - Summary (Month)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["reports", "summary"], "query": [
+                            { "key": "period", "value": "month" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Reports - Summary (Week)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["reports", "summary"], "query": [
+                            { "key": "period", "value": "week" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Reports - Summary (3 Months)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["reports", "summary"], "query": [
+                            { "key": "period", "value": "3months" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Reports - Summary (Year)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["reports", "summary"], "query": [
+                            { "key": "period", "value": "year" }
+                        ]}
+                    }
+                },
+                {
+                    "name": "Reports - By Category",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["reports", "by-category"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Settings",
+            "item": [
+                {
+                    "name": "Settings - Get",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["settings"] }
+                    }
+                },
+                {
+                    "name": "Settings - Upsert",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"currencyCode\":\"PKR\",\"languageCode\":\"en\"}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["settings"] }
+                    }
+                },
+                {
+                    "name": "Settings - Delete",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["settings"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Admin",
+            "item": [
+                {
+                    "name": "Admin - Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["admin", "users"] }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Data",
+            "item": [
+                {
+                    "name": "Data - Backup (Export)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["data", "backup"] },
+                        "description": "Exports all your data as JSON: settings, categories, customers, transactions. Save the response body to use with Restore."
+                    }
+                },
+                {
+                    "name": "Data - Restore (Import)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            { "key": "Content-Type", "value": "application/json" },
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"exportedAt\": \"2026-08-25T12:00:00Z\",\n  \"appVersion\": \"1.0\",\n  \"settings\": { \"currencyCode\": \"PKR\", \"languageCode\": \"en\" },\n  \"categories\": [ { \"name\": \"My Cat\", \"isDefault\": false, \"originalId\": 100 } ],\n  \"customers\": [ { \"name\": \"Ali\", \"phone\": \"03001234567\", \"email\": \"\", \"notes\": \"\", \"originalId\": 200 } ],\n  \"transactions\": [ { \"amount\": 500, \"type\": 1, \"note\": \"imported\", \"transactionDate\": \"2026-08-25T10:00:00Z\", \"originalCategoryId\": 100, \"originalCustomerId\": 200 } ]\n}"
+                        },
+                        "url": { "host": ["{{baseUrl}}"], "path": ["data", "restore"], "query": [
+                            { "key": "replace", "value": "false", "description": "true = wipe my data first, then import" }
+                        ]},
+                        "description": "Imports a backup JSON. Category/customer IDs are remapped automatically. replace=true wipes existing data first (atomic)."
+                    }
+                },
+                {
+                    "name": "Data - Clear All My Data",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            { "key": "Authorization", "value": "Bearer {{token}}" }
+                        ],
+                        "url": { "host": ["{{baseUrl}}"], "path": ["data", "all"] },
+                        "description": "Danger Zone: soft-deletes ALL your transactions, customers and categories (attachments deleted from disk). Account stays active."
+                    }
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            { "key": "token", "type": "string", "value": "{{token}}" }
+        ]
+    }
+}
